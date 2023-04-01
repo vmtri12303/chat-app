@@ -133,12 +133,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   void onClickSearchButton() async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    await firestore
-        .collection('users')
-        .where('email', isEqualTo: _searchTextController.text)
-        .get()
-        .then((values) {
-      myUser.value = MyUser.fromJson(values.docs[0].data());
-    });
+    try {
+      await firestore
+          .collection('users')
+          .where('email', isEqualTo: _searchTextController.text)
+          .get()
+          .then((values) {
+        myUser.value = MyUser.fromJson(values.docs[0].data());
+      });
+    } catch (e) {
+      print('saas');
+    }
   }
 }
