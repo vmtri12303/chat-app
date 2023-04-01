@@ -143,6 +143,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       });
     } catch (e) {
       print('saas');
+      // print('asdasdasdassaadss');
     }
   }
 }
