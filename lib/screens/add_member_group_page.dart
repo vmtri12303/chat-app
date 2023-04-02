@@ -27,6 +27,8 @@ class _AddMemberGroupState extends State<AddMemberGroup> {
 
   var userMap = Rxn<Map<String, dynamic>>();
 
+  var isUserFound = true.obs;
+
   @override
   void initState() {
     super.initState();
@@ -89,7 +91,17 @@ class _AddMemberGroupState extends State<AddMemberGroup> {
                 }
                 return Container();
               },
-            )
+            ),
+            Obx(() {
+              if (!isUserFound.value) {
+                return Text(
+                  'User not found',
+                  style: TextStyle(fontSize: 20, color: Colors.red),
+                );
+              } else {
+                return Container();
+              }
+            }),
           ],
         )),
         floatingActionButton: Obx(() {
@@ -116,7 +128,14 @@ class _AddMemberGroupState extends State<AddMemberGroup> {
         .where("email", isEqualTo: _searchText.text)
         .get()
         .then((value) {
-      userMap.value = value.docs[0].data();
+      if (value.docs.isNotEmpty) {
+        userMap.value = value.docs[0].data();
+        isUserFound.value = true;
+      } else {
+        userMap.value = null;
+        isUserFound.value = false;
+      }
+
       isLoading.value = false;
 
       print(userMap);

@@ -19,6 +19,7 @@ class AddNewMemberInGroup2 extends StatelessWidget {
   final _seachEditController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Rxn<Map<String, dynamic>> userMap = Rxn<Map<String, dynamic>>();
+  var isUserFound = true.obs;
   @override
   Widget build(BuildContext context) {
     print(memberList);
@@ -58,6 +59,16 @@ class AddNewMemberInGroup2 extends StatelessWidget {
                     ))
                 : Container();
           }),
+          Obx(() {
+            if (!isUserFound.value) {
+              return Text(
+                'User not found',
+                style: TextStyle(fontSize: 20, color: Colors.red),
+              );
+            } else {
+              return Container();
+            }
+          }),
         ],
       )),
     );
@@ -69,7 +80,13 @@ class AddNewMemberInGroup2 extends StatelessWidget {
         .where('email', isEqualTo: _seachEditController.text)
         .get()
         .then((value) {
-      userMap.value = value.docs[0].data();
+      if (value.docs.isNotEmpty) {
+        userMap.value = value.docs[0].data();
+        isUserFound.value = true;
+      } else {
+        userMap.value = null;
+        isUserFound.value = false;
+      }
     });
   }
 
@@ -109,7 +126,7 @@ class AddNewMemberInGroup2 extends StatelessWidget {
         "time": FieldValue.serverTimestamp(),
         "sendBy": _auth.currentUser!.displayName,
       });
-      Get.offAll(GroupChatRoomPage);
+      Get.snackbar('Add Successfully', '');
       userMap.value = null;
     } else {
       Get.defaultDialog(

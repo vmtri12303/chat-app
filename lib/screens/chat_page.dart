@@ -49,7 +49,7 @@ class ChatPage extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: size.height / 1.25,
+              height: size.height / 1.3,
               width: size.width,
               child: StreamBuilder<QuerySnapshot>(
                 stream: _firestore
@@ -103,37 +103,40 @@ class ChatPage extends StatelessWidget {
                 },
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        alignment: Alignment.center,
-        height: size.height * 1 / 10,
-        width: size.width,
-        child: Container(
-          height: size.height / 12,
-          width: size.width / 1.1,
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             Container(
               alignment: Alignment.center,
-              height: size.height / 12,
-              width: size.width / 1.5,
-              child: TextField(
-                controller: _messageTextController,
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                      onPressed: () {
-                        getImage();
-                      },
-                      icon: const Icon(Icons.photo)),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
+              height: size.height * 1 / 10,
+              width: size.width,
+              child: Container(
+                height: size.height / 12,
+                width: size.width / 1.1,
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        height: size.height / 12,
+                        width: size.width / 1.5,
+                        child: TextField(
+                          controller: _messageTextController,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  getImage();
+                                },
+                                icon: const Icon(Icons.photo)),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: onSendMessage,
+                          icon: const Icon(Icons.send))
+                    ]),
               ),
             ),
-            IconButton(onPressed: onSendMessage, icon: const Icon(Icons.send))
-          ]),
+          ],
         ),
       ),
     );

@@ -20,6 +20,7 @@ class MyTextField extends StatelessWidget {
       padding: EdgeInsets.symmetric(
           horizontal: size.width / 20, vertical: size.height / 55),
       child: TextField(
+        obscureText: hintText == 'Password' ? true : false,
         controller: textController,
         decoration: InputDecoration(
             prefixIcon: icon,

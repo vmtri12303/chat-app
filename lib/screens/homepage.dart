@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firebaseStore = FirebaseFirestore.instance;
   var myUser = Rxn<MyUser>();
+  var isUserFound = true.obs;
 
   @override
   void initState() {
@@ -51,7 +52,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text(_auth.currentUser?.displayName != null
+            ? 'Welcome ${_auth.currentUser!.displayName}'
+            : "Welcome"),
         actions: [
           IconButton(
             onPressed: () => logOut(),
@@ -83,7 +86,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     ),
                     onTap: () {
                       String roomId = chatRoomId(
-                          _auth.currentUser!.displayName, myUser.value!.name);
+                          _auth.currentUser!.displayName,
+                          myUser.value!.name,
+                          _auth.currentUser!.email,
+                          myUser.value!.email);
                       MyUser userPass = MyUser(
                           name: myUser.value!.name,
                           id: myUser.value!.id,
@@ -110,6 +116,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   )
                 : Container();
           }),
+          Obx(() {
+            if (!isUserFound.value) {
+              return Text(
+                'User not found',
+                style: TextStyle(fontSize: 20, color: Colors.red),
+              );
+            } else {
+              return Container();
+            }
+          }),
         ],
       )),
       floatingActionButton: FloatingActionButton(
@@ -117,17 +133,27 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     );
   }
 
-  String chatRoomId(String? user1, String user2) {
+  String chatRoomId(
+      String? user1, String user2, String? email1, String email2) {
+    print(email1);
+    print(email2);
     try {
-      if (user1![0].toLowerCase().codeUnits[0] >
-          user2[0].toLowerCase().codeUnits[0]) {
-        return '$user1$user2';
-      } else {
-        return '$user2$user1';
+      for (var i = 0; i < email1!.length; i++) {
+        if (email1[i] != email2[i]) {
+          if (email1[i].toLowerCase().codeUnits[0] >
+              email2[i].toLowerCase().codeUnits[0]) {
+            print(email1[i].toLowerCase().codeUnits[0]);
+            print(email2[i].toLowerCase().codeUnits[0]);
+            return '$user1$user2';
+          } else {
+            return '$user2$user1';
+          }
+        }
       }
     } catch (e) {
       print(e);
     }
+
     return '';
   }
 
@@ -139,11 +165,16 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           .where('email', isEqualTo: _searchTextController.text)
           .get()
           .then((values) {
-        myUser.value = MyUser.fromJson(values.docs[0].data());
+        if (values.docs.isNotEmpty) {
+          myUser.value = MyUser.fromJson(values.docs[0].data());
+          isUserFound.value = true;
+        } else {
+          myUser.value = null;
+          isUserFound.value = false;
+        }
       });
     } catch (e) {
-      print('saas');
-      // print('asdasdasdassaadss');
+      print(e);
     }
   }
 }
